@@ -15,7 +15,8 @@ const RingBell: React.FC = () => {
       });
       const data = await response.json();
       if (data.success) {
-        alert("Bell has been rung!");
+        console.log(data);
+        
       }
     } catch (error) {
       console.error("Error ringing the bell:", error);

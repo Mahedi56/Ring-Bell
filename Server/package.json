@@ -1,25 +1,31 @@
 {
   "name": "server",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "./dist/index.js",
+  "type": "module",
   "scripts": {
-    "build": "tsc",                
-  "start": "node dist/index.js",  
-  "dev": "npm run build && npm start"  
+    "start": "node .",
+    "start:watch": "linkemon --inspect=0.0.0.0:12003 .",
+    "build": "tsc",
+    "build:no-check": "tsc || exit 0",
+    "build:watch": "tsc --watch --preserveWatchOutput",
+    "dev": "concurrently npm:build:watch npm:start:watch"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "cors": "^2.8.5",
-    "express": "^4.21.2",
-    "nodemon": "^3.1.9"
+    "cors": "2.8.5",
+    "express": "4.21.2",
+    "nodemon": "3.1.9"
   },
   "devDependencies": {
-    "@types/cors": "^2.8.17",
-    "@types/express": "^5.0.0",
-    "@types/node": "^22.13.10",
-    "typescript": "^5.8.2"
+    "@types/cors": "2.8.17",
+    "@types/express": "5.0.0",
+    "@types/node": "22.13.10",
+    "typescript": "5.8.2",
+    "concurrently": "9.1.2",
+    "linkemon": "0.2.0"
   }
 }
