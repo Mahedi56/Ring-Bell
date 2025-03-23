@@ -1,7 +1,41 @@
-#QRCODE{
-    width: 150px;
-    background-color: aquamarine;
-    color: black;
+#QRCODE {
+  width: 150px;
+  background-color: aquamarine;
+  color: black;
+  border-style: none;
+  cursor: pointer;
+}
+
+.flex {
+    display: flex;
+}
+.flex-col{
+    flex-direction: column;
+}
+.items-center{
+    align-items: center;
+}
+.boxstyle{
+    width: 200px;
+    height: 200px;
+    background-color: gray;
+    color: white;
     border-style: none;
     cursor: pointer;
+    margin-left: 200px;
+}
+@keyframes bellAnimation {
+  0% {
+    background-color: red;
+  }
+  50% {
+    background-color: pink;
+  }
+  100% {
+    background-color: gray;
+  }
+}
+
+.bell-active {
+  animation: bellAnimation 5s ease;
 }

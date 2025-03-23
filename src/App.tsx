@@ -1,40 +1,54 @@
-import { useEffect} from "react";
+import { useEffect, useState } from "react";
 import QRCode from "react-qr-code";
 import RingBell from "./Components/RingBell";
 
 const baseURL = `http://${window.location.hostname}:3001/`;
 const qrCodeValue = `http://${window.location.hostname}:5173/?page=ringbell`;
-let count1=0;
+let count1 = 0;
 const App: React.FC = () => {
-
   const params = new URLSearchParams(window.location.search);
   const page = params.get("page");
-
+  const [ringbutton, setRingButton] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(async () => {
       try {
-        const response = await fetch(`${baseURL}bellstatus?count=${count1}`);  
+        const response = await fetch(`${baseURL}bellstatus?count=${count1}`);
         const data = await response.json();
         console.log(data.isBellRung, data.count);
-        
+
         const playAudio = () => {
           const audio = new Audio("dingdong.mp3");
-          audio.play().catch(error => console.log("Autoplay blocked:", error));
+          audio
+            .play()
+            .catch((error) => console.log("Autoplay blocked:", error));
+          setIsAnimating(true);
+          setTimeout(() => setIsAnimating(false), 5000);
         };
 
-        if (data.isBellRung && count1!=data.count && page !== "ringbell") {
+        if (
+          data.isBellRung &&
+          count1 != data.count &&
+          page !== "ringbell" &&
+          ringbutton
+        ) {
           playAudio();
         }
-        count1=data.count;
+        count1 = data.count;
       } catch (error) {
         console.error("Error fetching bell status:", error);
       }
     }, 3000);
 
+    // setRingButton(localStorage.getItem("ringbutton") === "true");
     return () => clearInterval(interval);
-  }, []); 
+  }, [ringbutton]);
 
+  const handleEnableQrCode = () => {
+    setRingButton(true);
+    // localStorage.setItem("ringbutton", "true");
+  };
 
   if (page === "ringbell") {
     console.log("ringbell");
@@ -42,14 +56,30 @@ const App: React.FC = () => {
   }
 
   return (
-   
-        <div className="flex flex-col items-center p-4">
-          <h1 className="text-2xl mb-4">Scan the QR Code</h1>
-          <QRCode value={qrCodeValue} size={200} />
-          
+    <div>
+      {ringbutton ? (
+        <div className="flex items-center">
+          <div className="flex flex-col ">
+            <h1 >Scan the QR Code</h1>
+            <QRCode value={qrCodeValue} size={200} />
+            <button
+              onClick={() => {
+                setRingButton(false);
+                // localStorage.setItem("ringbutton", "false");
+              }}
+            >
+              disable
+            </button>
+          </div>
+          <div className={`boxstyle ${isAnimating ? "bell-active" : ""}`}>
+            
+          </div>
         </div>
+      ) : (
+        <button onClick={handleEnableQrCode}>Enable Qr Code</button>
+      )}
+    </div>
   );
-  
 };
 
 export default App;
