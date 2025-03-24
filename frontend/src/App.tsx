@@ -11,38 +11,46 @@ const App: React.FC = () => {
   const [ringbutton, setRingButton] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
 
-  useEffect(() => {
-    const interval = setInterval(async () => {
-      try {
-        const response = await fetch(`${baseURL}bellstatus?count=${count1}`);
-        const data = await response.json();
-        console.log(data.isBellRung, data.count);
+  const playAudio = () => {
+    const audio = new Audio("bell.mp3");
+    audio.play().catch((error) => console.log("Autoplay blocked:", error));
+    setIsAnimating(true);
+    setTimeout(() => {
+      audio.pause();
+      audio.currentTime = 0;
+      setIsAnimating(false);
+    }, 2000);
+  };
 
-        const playAudio = () => {
-          const audio = new Audio("dingdong.mp3");
-          audio
-            .play()
-            .catch((error) => console.log("Autoplay blocked:", error));
-          setIsAnimating(true);
-          setTimeout(() => setIsAnimating(false), 5000);
-        };
+  const checkBellStatus = async () => {
+    try {
+      const response = await fetch(`${baseURL}bellstatus?count=${count1}`);
+      const data = await response.json();
+      console.log(data.isBellRung, data.count);
 
-        if (
-          data.isBellRung &&
-          count1 != data.count &&
-          page !== "ringbell" &&
-          ringbutton
-        ) {
-          playAudio();
-        }
-        count1 = data.count;
-      } catch (error) {
-        console.error("Error fetching bell status:", error);
+      if (
+        data.isBellRung &&
+        page !== "ringbell" &&
+        ringbutton
+      ) {
+        playAudio();
       }
-    }, 3000);
+      count1 = data.count;
 
-    // setRingButton(localStorage.getItem("ringbutton") === "true");
-    return () => clearInterval(interval);
+      const timeoutId = setTimeout(checkBellStatus, 1000);
+      return () => clearTimeout(timeoutId);
+    
+    
+    } catch (error) {
+
+      console.error("Error fetching bell status:", error);
+      const timeoutId = setTimeout(checkBellStatus, 1000);
+      return () => clearTimeout(timeoutId);
+    }
+  };
+
+  useEffect(() => {
+    checkBellStatus();
   }, [ringbutton]);
 
   const handleEnableQrCode = () => {
@@ -60,7 +68,7 @@ const App: React.FC = () => {
       {ringbutton ? (
         <div className="flex items-center">
           <div className="flex flex-col ">
-            <h1 >Scan the QR Code</h1>
+            <h1>Scan the QR Code</h1>
             <QRCode value={qrCodeValue} size={200} />
             <button
               onClick={() => {
@@ -71,9 +79,7 @@ const App: React.FC = () => {
               disable
             </button>
           </div>
-          <div className={`boxstyle ${isAnimating ? "bell-active" : ""}`}>
-            
-          </div>
+          <div className={`boxstyle ${isAnimating ? "bell-active" : ""}`}></div>
         </div>
       ) : (
         <button onClick={handleEnableQrCode}>Enable Qr Code</button>
