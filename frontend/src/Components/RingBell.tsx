@@ -4,6 +4,7 @@ import React from "react";
 const baseURL = `http://${window.location.hostname}:3001/`;
 
 const RingBell: React.FC = () => {
+
   const handleClick = async () => {
     try {
       const response = await fetch(`${baseURL}ringbell`, {  
@@ -16,7 +17,6 @@ const RingBell: React.FC = () => {
       const data = await response.json();
       if (data.success) {
         console.log(data);
-        
       }
     } catch (error) {
       console.error("Error ringing the bell:", error);

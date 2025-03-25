@@ -1,30 +1,27 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
+import { EventEmitter } from "events";
 
+const bellEmitter = new EventEmitter();
 const app = express();
-const port = parseInt('3001');
- 
+const port = parseInt("3001");
+
 app.use(cors());
 app.use(express.json());
 
-let isBellRung: boolean = false;
+
 let count: number = 0;
 
 app.post("/ringbell", (req: Request, res: Response) => {
-  isBellRung = true;
   count++;
-  res.json({ success: true }); 
+
+  bellEmitter.emit("ringed", {count });
+
+  res.json({ success: true });
 });
 
 app.get("/bellstatus", (req: Request, res: Response) => {
-  const count1: number = Number(req.query.count);
-
-  if (isBellRung && count !== count1) {
-    res.json({ isBellRung, count });
-  } else {
-    isBellRung = false;
-    res.json({ isBellRung, count });
-  }
+  res.json({ count });
 });
 
 app.listen(port, () => {
