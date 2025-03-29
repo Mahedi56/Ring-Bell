@@ -16,16 +16,18 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@trpc/server": "^11.0.1",
     "cors": "2.8.5",
     "express": "4.21.2",
-    "nodemon": "3.1.9"
+    "nodemon": "3.1.9",
+    "zod": "^3.24.2"
   },
   "devDependencies": {
     "@types/cors": "2.8.17",
     "@types/express": "5.0.0",
     "@types/node": "22.13.10",
-    "typescript": "5.8.2",
     "concurrently": "9.1.2",
-    "linkemon": "0.2.0"
+    "linkemon": "0.2.0",
+    "typescript": "5.8.2"
   }
 }

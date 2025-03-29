@@ -5,22 +5,58 @@ import RingBell from "./Components/RingBell";
 const baseURL = `http://${window.location.hostname}:3001/`;
 const qrCodeValue = `http://${window.location.hostname}:5173/?page=ringbell`;
 let count1 = 0;
+let audioInstance: HTMLAudioElement | null = null;
 const App: React.FC = () => {
   const params = new URLSearchParams(window.location.search);
   const page = params.get("page");
   const [ringbutton, setRingButton] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
 
+  
   const playAudio = () => {
-    const audio = new Audio("bell.mp3");
-    audio.play().catch((error) => console.log("Autoplay blocked:", error));
+    // Stop previous audio if it's playing
+    if (audioInstance) {
+      console.log("Stopping previous audio...");
+      audioInstance.pause();
+      audioInstance.currentTime = 0;  
+      setIsAnimating(false);
+      
+    }
+
+    audioInstance = new Audio("dingdong.mp3");
+    audioInstance.play().catch((error) => console.log("Autoplay blocked:", error));
     setIsAnimating(true);
     setTimeout(() => {
-      audio.pause();
-      audio.currentTime = 0;
+      console.log("Bell is rung");
       setIsAnimating(false);
-    }, 2000);
+    }, 5000);
   };
+  //   try {
+  //     const response = await fetch(`${baseURL}bellstatus?count=${count1}`);
+  //     const data = await response.json();
+  //     console.log(data.isBellRung, data.count);
+  //     console.log("inside checkBellStatus");
+  //     if (
+  //       data.isBellRung &&
+  //       page !== "ringbell" &&
+  //       ringbutton
+  //     ) {
+  //       setIsAnimating(false);
+  //       playAudio();
+  //     }
+  //     count1 = data.count;
+  //   checkBellStatus();
+
+  //   } catch (error) {
+
+  //     console.error("Error fetching bell status:", error);
+  //     checkBellStatus();
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   checkBellStatus();
+  // }, [ringbutton]);
 
   const checkBellStatus = async () => {
     try {
@@ -28,24 +64,15 @@ const App: React.FC = () => {
       const data = await response.json();
       console.log(data.isBellRung, data.count);
 
-      if (
-        data.isBellRung &&
-        page !== "ringbell" &&
-        ringbutton
-      ) {
+      if (data.isBellRung && page !== "ringbell" && ringbutton) {
         playAudio();
       }
+
       count1 = data.count;
-
-      const timeoutId = setTimeout(checkBellStatus, 1000);
-      return () => clearTimeout(timeoutId);
-    
-    
+      checkBellStatus();
     } catch (error) {
-
       console.error("Error fetching bell status:", error);
-      const timeoutId = setTimeout(checkBellStatus, 1000);
-      return () => clearTimeout(timeoutId);
+      checkBellStatus();
     }
   };
 
@@ -55,7 +82,7 @@ const App: React.FC = () => {
 
   const handleEnableQrCode = () => {
     setRingButton(true);
-    // localStorage.setItem("ringbutton", "true");
+   
   };
 
   if (page === "ringbell") {
@@ -70,14 +97,15 @@ const App: React.FC = () => {
           <div className="flex flex-col ">
             <h1>Scan the QR Code</h1>
             <QRCode value={qrCodeValue} size={200} />
+            <br />
+            <br />
             <button
               onClick={() => {
                 setRingButton(false);
-                // localStorage.setItem("ringbutton", "false");
               }}
             >
               disable
-            </button>
+            </button> 
           </div>
           <div className={`boxstyle ${isAnimating ? "bell-active" : ""}`}></div>
         </div>

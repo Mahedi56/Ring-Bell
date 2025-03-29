@@ -37,5 +37,5 @@
 }
 
 .bell-active {
-  animation: bellAnimation 2s ease;
+  animation: bellAnimation 5s ease;
 }
