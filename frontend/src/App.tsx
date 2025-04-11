@@ -14,60 +14,30 @@ const App: React.FC = () => {
 
   
   const playAudio = () => {
-    // Stop previous audio if it's playing
     if (audioInstance) {
       console.log("Stopping previous audio...");
       audioInstance.pause();
-      audioInstance.currentTime = 0;  
-      setIsAnimating(false);
-      
+      audioInstance.currentTime = 0; 
     }
-
-    audioInstance = new Audio("dingdong.mp3");
-    audioInstance.play().catch((error) => console.log("Autoplay blocked:", error));
-    setIsAnimating(true);
+    setIsAnimating(false);
     setTimeout(() => {
-      console.log("Bell is rung");
-      setIsAnimating(false);
-    }, 5000);
+      audioInstance = new Audio("dingdong.mp3");
+      audioInstance.play().catch((error) => console.log("Autoplay blocked:", error));
+      setIsAnimating(true);
+    }, 20); 
+
   };
-  //   try {
-  //     const response = await fetch(`${baseURL}bellstatus?count=${count1}`);
-  //     const data = await response.json();
-  //     console.log(data.isBellRung, data.count);
-  //     console.log("inside checkBellStatus");
-  //     if (
-  //       data.isBellRung &&
-  //       page !== "ringbell" &&
-  //       ringbutton
-  //     ) {
-  //       setIsAnimating(false);
-  //       playAudio();
-  //     }
-  //     count1 = data.count;
-  //   checkBellStatus();
-
-  //   } catch (error) {
-
-  //     console.error("Error fetching bell status:", error);
-  //     checkBellStatus();
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   checkBellStatus();
-  // }, [ringbutton]);
-
   const checkBellStatus = async () => {
     try {
       const response = await fetch(`${baseURL}bellstatus?count=${count1}`);
       const data = await response.json();
+      console.log(data);
+      
       console.log(data.isBellRung, data.count);
 
       if (data.isBellRung && page !== "ringbell" && ringbutton) {
         playAudio();
       }
-
       count1 = data.count;
       checkBellStatus();
     } catch (error) {
@@ -82,7 +52,6 @@ const App: React.FC = () => {
 
   const handleEnableQrCode = () => {
     setRingButton(true);
-   
   };
 
   if (page === "ringbell") {
